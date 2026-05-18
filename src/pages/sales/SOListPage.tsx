@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Table, Card, Typography, Tag, Space, Button, message, Popconfirm, Tooltip } from 'antd';
-import { PlusOutlined, EyeOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { PlusOutlined, EyeOutlined, CheckCircleOutlined, CloseCircleOutlined, FileExcelOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { salesApi } from '../../api/salesApi';
+import { exportOrders } from '../../utils/exportExcel';
 import type { SalesOrder } from '../../types';
 
 const { Title, Text } = Typography;
@@ -80,10 +81,19 @@ export default function SOListPage() {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>Danh Sách Đơn Hàng</Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/sales/create')}
-          style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none' }}>
-          Tạo Đơn Hàng
-        </Button>
+        <Space>
+          <Button
+            icon={<FileExcelOutlined />}
+            onClick={() => exportOrders(orders)}
+            style={{ background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', color: '#fff' }}
+          >
+            Xuất Excel
+          </Button>
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/sales/create')}
+            style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none' }}>
+            Tạo Đơn Hàng
+          </Button>
+        </Space>
       </div>
       <Card bordered={false} style={{ borderRadius: 12 }}>
         <Table dataSource={orders} columns={columns} rowKey="id" loading={loading} pagination={{ pageSize: 10, showTotal: (t) => `Tổng ${t} đơn hàng` }} />

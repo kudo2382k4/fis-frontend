@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Table, Button, Tag, Typography, Space, Popconfirm, message, Card } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, FileExcelOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { productApi } from '../../api/productApi';
+import { exportInventory } from '../../utils/exportExcel';
 import type { Product, ProductVariant } from '../../types'; // ProductVariant used in render
 
 const { Title, Text } = Typography;
@@ -83,12 +84,21 @@ export default function ProductListPage() {
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>Danh Sách Sản Phẩm</Title>
-        {role === 'ROLE_OWNER' && (
-          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/products/create')}
-            style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none' }}>
-            Tạo Sản Phẩm
+        <Space>
+          <Button
+            icon={<FileExcelOutlined />}
+            onClick={() => exportInventory(products)}
+            style={{ background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', color: '#fff' }}
+          >
+            Xuất Excel
           </Button>
-        )}
+          {role === 'ROLE_OWNER' && (
+            <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/products/create')}
+              style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none' }}>
+              Tạo Sản Phẩm
+            </Button>
+          )}
+        </Space>
       </div>
 
       <Card bordered={false} style={{ borderRadius: 12 }}>

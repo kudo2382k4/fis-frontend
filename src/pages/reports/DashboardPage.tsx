@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Row, Col, Card, Statistic, Typography, Table, Tag, Spin, DatePicker,
-  Avatar, Progress, Badge,
+  Avatar, Progress, Badge, Button, Dropdown, Space,
 } from 'antd';
 import {
   ShoppingCartOutlined,
@@ -13,10 +13,13 @@ import {
   ClockCircleOutlined,
   CrownOutlined,
   UserOutlined,
+  FileExcelOutlined,
+  DownloadOutlined,
 } from '@ant-design/icons';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { reportApi } from '../../api/reportApi';
-import type { DailyRevenue, LowStockAlert, TopSellingProduct, RecentOrder, TopCustomer } from '../../types';
+import { exportRevenue, exportStockMovements } from '../../utils/exportExcel';
+import type { DailyRevenue, LowStockAlert, TopSellingProduct, RecentOrder, TopCustomer, StockMovementSummary } from '../../types';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -37,6 +40,7 @@ export default function DashboardPage() {
   const [topProducts, setTopProducts] = useState<TopSellingProduct[]>([]);
   const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
   const [topCustomers, setTopCustomers] = useState<TopCustomer[]>([]);
+  const [stockMovements, setStockMovements] = useState<StockMovementSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
     dayjs().subtract(30, 'day'),
@@ -48,18 +52,20 @@ export default function DashboardPage() {
     try {
       const from = dateRange[0].format('YYYY-MM-DD');
       const to = dateRange[1].format('YYYY-MM-DD');
-      const [rev, ls, tp, ro, tc] = await Promise.all([
+      const [rev, ls, tp, ro, tc, sm] = await Promise.all([
         reportApi.getDailyRevenue(from, to),
         reportApi.getLowStock(),
         reportApi.getTopSellingProducts(from, to, 5),
         reportApi.getRecentOrders(10),
         reportApi.getTopCustomers(5),
+        reportApi.getStockMovements(from, to),
       ]);
       setRevenue(rev);
       setLowStock(ls);
       setTopProducts(tp);
       setRecentOrders(ro);
       setTopCustomers(tc);
+      setStockMovements(sm);
     } finally {
       setLoading(false);
     }
@@ -133,15 +139,43 @@ export default function DashboardPage() {
     { title: 'Tổng SKU Theo Dõi', value: '-', prefix: <InboxOutlined />, color: '#8B5CF6' },
   ];
 
+  const fromStr = dateRange[0].format('DD/MM/YYYY');
+  const toStr = dateRange[1].format('DD/MM/YYYY');
+
+  const exportMenuItems = [
+    {
+      key: 'revenue',
+      label: 'Báo Cáo Doanh Thu',
+      icon: <FileExcelOutlined style={{ color: '#10B981' }} />,
+      onClick: () => exportRevenue(revenue, fromStr, toStr),
+    },
+    {
+      key: 'movements',
+      label: 'Biến Động Tồn Kho',
+      icon: <FileExcelOutlined style={{ color: '#F59E0B' }} />,
+      onClick: () => exportStockMovements(stockMovements, fromStr, toStr),
+    },
+  ];
+
   return (
     <Spin spinning={loading}>
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Title level={4} style={{ margin: 0 }}>Dashboard</Title>
-        <RangePicker
-          value={dateRange}
-          onChange={(v) => v && setDateRange(v as [dayjs.Dayjs, dayjs.Dayjs])}
-          format="DD/MM/YYYY"
-        />
+        <Space>
+          <RangePicker
+            value={dateRange}
+            onChange={(v) => v && setDateRange(v as [dayjs.Dayjs, dayjs.Dayjs])}
+            format="DD/MM/YYYY"
+          />
+          <Dropdown menu={{ items: exportMenuItems }} placement="bottomRight">
+            <Button
+              icon={<DownloadOutlined />}
+              style={{ background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', color: '#fff' }}
+            >
+              Xuất Excel
+            </Button>
+          </Dropdown>
+        </Space>
       </div>
 
       {/* KPI Cards */}
