@@ -135,7 +135,63 @@ export function exportOrders(orders: SalesOrder[]) {
   download(wb, 'DanhSachDonHang');
 }
 
-/** 4. Xuất báo cáo biến động kho */
+/** 4. Xuất chi tiết một đơn hàng */
+export function exportSingleOrder(order: SalesOrder) {
+  const STATUS_LABEL: Record<string, string> = {
+    PENDING:   'Chờ Xử Lý',
+    COMPLETED: 'Hoàn Thành',
+    CANCELED:  'Đã Hủy',
+  };
+
+  // ── Phần header đơn hàng ──────────────────────────────────────────
+  const headerRows = [
+    ['CHI TIẾT ĐƠN HÀNG'],
+    [],
+    ['Mã Đơn Hàng',    order.id],
+    ['Khách Hàng',     order.customerName],
+    ['Số Điện Thoại',  order.customerPhone],
+    ['Trạng Thái',     STATUS_LABEL[order.status] ?? order.status],
+    ['Nhân Viên Tạo',  order.createdByEmail],
+    ['Ngày Tạo',       dayjs(order.createdAt).format('DD/MM/YYYY HH:mm')],
+    ['Ghi Chú',        order.notes ?? '—'],
+    [],
+  ];
+
+  // ── Phần bảng sản phẩm ───────────────────────────────────────────
+  const itemHeader = [['STT', 'SKU', 'Màu Sắc', 'Kích Cỡ', 'Kho', 'Số Lượng', 'Đơn Giá (₫)', 'Thành Tiền (₫)']];
+
+  const itemRows = (order.items ?? []).map((item, idx) => [
+    idx + 1,
+    item.variantSku,
+    item.variantColor ?? '—',
+    item.variantSize  ?? '—',
+    item.storageLocationName,
+    item.quantity,
+    item.unitPrice,
+    item.subtotal,
+  ]);
+
+  const totalRow = [['', '', '', '', '', '', 'TỔNG CỘNG', order.totalAmount]];
+
+  // ── Ghép tất cả vào 1 sheet ───────────────────────────────────────
+  const ws = XLSX.utils.aoa_to_sheet([
+    ...headerRows,
+    ...itemHeader,
+    ...itemRows,
+    ...totalRow,
+  ]);
+
+  ws['!cols'] = [
+    { wch: 6 }, { wch: 18 }, { wch: 12 }, { wch: 10 },
+    { wch: 20 }, { wch: 10 }, { wch: 16 }, { wch: 18 },
+  ];
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Chi Tiết Đơn Hàng');
+  download(wb, `DonHang_${order.id.slice(0, 8)}`);
+}
+
+/** 5. Xuất báo cáo biến động kho */
 export function exportStockMovements(data: StockMovementSummary[], from: string, to: string) {
   const rows = data.map((r) => ({
     'SKU': r.variantSku,

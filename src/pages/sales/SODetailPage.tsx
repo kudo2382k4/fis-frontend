@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Card, Descriptions, Table, Tag, Button, Typography, Space, Popconfirm, message, Spin } from 'antd';
-import { CheckCircleOutlined, CloseCircleOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { CheckCircleOutlined, CloseCircleOutlined, ArrowLeftOutlined, FileExcelOutlined } from '@ant-design/icons';
 import { salesApi } from '../../api/salesApi';
+import { exportSingleOrder } from '../../utils/exportExcel';
 import type { SalesOrder, SalesOrderItem } from '../../types';
 
 const { Title, Text } = Typography;
@@ -58,16 +59,25 @@ export default function SODetailPage() {
           <Title level={4} style={{ margin: 0 }}>Chi Tiết Đơn Hàng</Title>
           <Tag color={statusConfig[status]?.color} style={{ fontSize: 13 }}>{statusConfig[status]?.label}</Tag>
         </Space>
-        {order.status === 'PENDING' && (
-          <Space>
-            <Popconfirm title="Xác nhận hoàn thành?" onConfirm={handleProcess} okText="Xác Nhận">
-              <Button type="primary" icon={<CheckCircleOutlined />} style={{ background: '#10B981', border: 'none' }}>Xác Nhận & Xuất Kho</Button>
-            </Popconfirm>
-            <Popconfirm title="Hủy đơn hàng này?" onConfirm={handleCancel} okText="Hủy Đơn" okButtonProps={{ danger: true }}>
-              <Button danger icon={<CloseCircleOutlined />}>Hủy Đơn</Button>
-            </Popconfirm>
-          </Space>
-        )}
+        <Space>
+          <Button
+            icon={<FileExcelOutlined />}
+            onClick={() => exportSingleOrder(order)}
+            style={{ background: 'linear-gradient(135deg, #10B981, #059669)', border: 'none', color: '#fff' }}
+          >
+            Xuất Excel
+          </Button>
+          {order.status === 'PENDING' && (
+            <>
+              <Popconfirm title="Xác nhận hoàn thành?" onConfirm={handleProcess} okText="Xác Nhận">
+                <Button type="primary" icon={<CheckCircleOutlined />} style={{ background: '#6366F1', border: 'none' }}>Xác Nhận & Xuất Kho</Button>
+              </Popconfirm>
+              <Popconfirm title="Hủy đơn hàng này?" onConfirm={handleCancel} okText="Hủy Đơn" okButtonProps={{ danger: true }}>
+                <Button danger icon={<CloseCircleOutlined />}>Hủy Đơn</Button>
+              </Popconfirm>
+            </>
+          )}
+        </Space>
       </div>
 
       <Card bordered={false} style={{ borderRadius: 12, marginBottom: 16 }}>
