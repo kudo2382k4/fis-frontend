@@ -222,6 +222,32 @@ export interface StockMovementSummary {
   estimatedRevenue: number;
 }
 
+export interface TopSellingProduct {
+  productName: string;
+  sku: string;
+  color?: string;
+  size?: string;
+  totalQuantitySold: number;
+  totalRevenue: number;
+}
+
+export interface RecentOrder {
+  orderId: string;
+  customerName: string;
+  customerPhone: string;
+  status: 'PENDING' | 'COMPLETED' | 'CANCELED';
+  totalAmount: number;
+  createdAt: string;
+}
+
+export interface TopCustomer {
+  customerId: string;
+  customerName: string;
+  customerPhone: string;
+  totalOrders: number;
+  totalSpent: number;
+}
+
 // ==================== COMMON ====================
 export interface ApiError {
   status: number;
