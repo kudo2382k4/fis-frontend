@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react';
-import { Table, Button, Tag, Typography, Space, Popconfirm, message, Card, Modal } from 'antd';
+import { Table, Button, Tag, Typography, Space, Popconfirm, message, Card } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { productApi } from '../../api/productApi';
-import type { Product, ProductVariant } from '../../types';
+import type { Product, ProductVariant } from '../../types'; // ProductVariant used in render
 
 const { Title, Text } = Typography;
 
 export default function ProductListPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const navigate = useNavigate();
+  const role = localStorage.getItem('fis_user')
+    ? JSON.parse(localStorage.getItem('fis_user')!).role
+    : null;
 
   const fetchProducts = async () => {
     setLoading(true);
@@ -57,53 +59,36 @@ export default function ProductListPage() {
       key: 'actions',
       width: 160,
       render: (_: unknown, record: Product) => (
-        <Space>
-          <Button size="small" icon={<EyeOutlined />} onClick={() => setDetailProduct(record)} />
-          <Button size="small" icon={<EditOutlined />} onClick={() => navigate(`/products/${record.id}/edit`)} />
-          <Popconfirm title="Xóa sản phẩm này?" onConfirm={() => handleDelete(record.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
-            <Button size="small" danger icon={<DeleteOutlined />} />
-          </Popconfirm>
+        <Space onClick={e => e.stopPropagation()}>
+          <Button
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() => navigate(`/products/${record.id}`)}
+            title="Xem biến thể"
+          />
+          {role === 'ROLE_OWNER' && (
+            <Button size="small" icon={<EditOutlined />} onClick={() => navigate(`/products/${record.id}/edit`)} />
+          )}
+          {role === 'ROLE_OWNER' && (
+            <Popconfirm title="Xóa sản phẩm này?" onConfirm={() => handleDelete(record.id)} okText="Xóa" cancelText="Hủy" okButtonProps={{ danger: true }}>
+              <Button size="small" danger icon={<DeleteOutlined />} />
+            </Popconfirm>
+          )}
         </Space>
       ),
     },
-  ];
-
-  const variantColumns = [
-    {
-      title: 'Ảnh',
-      dataIndex: 'imageUrl',
-      key: 'imageUrl',
-      width: 64,
-      render: (url: string) =>
-        url ? (
-          <img
-            src={url}
-            alt="variant"
-            style={{ width: 48, height: 48, objectFit: 'cover', borderRadius: 6, border: '1px solid rgba(255,255,255,0.1)' }}
-          />
-        ) : (
-          <div style={{ width: 48, height: 48, borderRadius: 6, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
-            📦
-          </div>
-        ),
-    },
-    { title: 'SKU', dataIndex: 'sku', key: 'sku', render: (v: string) => <Text code>{v}</Text> },
-    { title: 'Màu', dataIndex: 'color', key: 'color', render: (v: string) => v ?? '—' },
-    { title: 'Size', dataIndex: 'size', key: 'size', render: (v: string) => v ?? '—' },
-    { title: 'Giá Bán', dataIndex: 'price', key: 'price', render: (v: number) => `${v?.toLocaleString('vi-VN')} ₫` },
-    { title: 'Giá Nhập', dataIndex: 'cost', key: 'cost', render: (v: number) => `${v?.toLocaleString('vi-VN')} ₫` },
-    { title: 'Tổng Kho', dataIndex: 'totalStock', key: 'totalStock', render: (v: number) => <Tag color={v > 0 ? 'green' : 'error'}>{v}</Tag> },
-    { title: 'Có Thể Bán', dataIndex: 'availableStock', key: 'availableStock', render: (v: number) => <Tag color={v > 0 ? 'cyan' : 'warning'}>{v}</Tag> },
   ];
 
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>Danh Sách Sản Phẩm</Title>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/products/create')}
-          style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none' }}>
-          Tạo Sản Phẩm
-        </Button>
+        {role === 'ROLE_OWNER' && (
+          <Button type="primary" icon={<PlusOutlined />} onClick={() => navigate('/products/create')}
+            style={{ background: 'linear-gradient(135deg, #6366F1, #8B5CF6)', border: 'none' }}>
+            Tạo Sản Phẩm
+          </Button>
+        )}
       </div>
 
       <Card bordered={false} style={{ borderRadius: 12 }}>
@@ -113,26 +98,12 @@ export default function ProductListPage() {
           rowKey="id"
           loading={loading}
           pagination={{ pageSize: 10, showTotal: (t) => `Tổng ${t} sản phẩm` }}
+          onRow={(record) => ({
+            onClick: () => navigate(`/products/${record.id}`),
+            style: { cursor: 'pointer' },
+          })}
         />
       </Card>
-
-      <Modal
-        open={!!detailProduct}
-        title={detailProduct?.name}
-        onCancel={() => setDetailProduct(null)}
-        footer={null}
-        width={900}
-      >
-        {detailProduct && (
-          <Table
-            dataSource={detailProduct.variants}
-            columns={variantColumns}
-            rowKey="id"
-            pagination={false}
-            size="small"
-          />
-        )}
-      </Modal>
     </>
   );
 }

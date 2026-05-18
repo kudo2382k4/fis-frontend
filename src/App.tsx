@@ -9,6 +9,8 @@ import { RoleGuard } from './components/RoleGuard';
 import LoginPage from './pages/auth/LoginPage';
 import DashboardPage from './pages/reports/DashboardPage';
 import ProductListPage from './pages/products/ProductListPage';
+import ProductDetailPage from './pages/products/ProductDetailPage';
+import VariantDetailPage from './pages/products/VariantDetailPage';
 import CreateProductPage from './pages/products/CreateProductPage';
 import EditProductPage from './pages/products/EditProductPage';
 import InventoryPage from './pages/inventory/InventoryPage';
@@ -67,6 +69,8 @@ export default function App() {
 
             {/* Products — tất cả xem được, chỉ OWNER tạo/sửa */}
             <Route path="products" element={<ProductListPage />} />
+            <Route path="products/:id" element={<ProductDetailPage />} />
+            <Route path="products/:id/variants/:variantId" element={<VariantDetailPage />} />
             <Route
               path="products/create"
               element={
