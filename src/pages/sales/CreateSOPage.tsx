@@ -177,7 +177,6 @@ export default function CreateSOPage() {
                 {fields.map(({ key, name, ...rest }) => {
                   const state = itemStates[name];
                   const qty: number = form.getFieldValue(['items', name, 'quantity']) || 1;
-                  const subtotal = state ? state.unitPriceBase * qty : 0;
 
                   return (
                     <div

@@ -210,5 +210,5 @@ export function exportStockMovements(data: StockMovementSummary[], from: string,
 
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Biến Động Kho');
-  download(wb, 'BaoCaoBienDongKho');
+  download(wb, `BaoCaoBienDongKho_${from.replace(/\//g, '')}_${to.replace(/\//g, '')}`);
 }

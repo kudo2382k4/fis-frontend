@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import {
   Card, Typography, Button, Tag, Spin, Row, Col, Breadcrumb,
-  Table, Divider, Statistic, Timeline, Empty,
+  Table, Statistic, Timeline, Empty,
 } from 'antd';
 import {
   ArrowLeftOutlined,
   ShopOutlined,
   SwapOutlined,
-  DollarOutlined,
   ClockCircleOutlined,
   ArrowUpOutlined,
   ArrowDownOutlined,

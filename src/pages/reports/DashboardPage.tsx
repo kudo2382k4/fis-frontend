@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Row, Col, Card, Statistic, Typography, Table, Tag, Spin, DatePicker,
-  Avatar, Progress, Badge, Button, Dropdown, Space,
+  Avatar, Progress, Button, Dropdown, Space,
 } from 'antd';
 import {
   ShoppingCartOutlined,
@@ -16,7 +16,7 @@ import {
   FileExcelOutlined,
   DownloadOutlined,
 } from '@ant-design/icons';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { reportApi } from '../../api/reportApi';
 import { exportRevenue, exportStockMovements } from '../../utils/exportExcel';
 import type { DailyRevenue, LowStockAlert, TopSellingProduct, RecentOrder, TopCustomer, StockMovementSummary } from '../../types';

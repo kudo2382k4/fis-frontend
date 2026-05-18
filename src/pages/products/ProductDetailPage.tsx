@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  Card, Typography, Button, Tag, Spin, Row, Col, Image, Breadcrumb, Tooltip, Badge,
+  Card, Typography, Button, Tag, Spin, Row, Col, Breadcrumb,
 } from 'antd';
 import {
   ArrowLeftOutlined,
@@ -23,7 +23,7 @@ function StockBadge({ stock }: { stock: number }) {
   return <Tag color="success">{stock} cái</Tag>;
 }
 
-function VariantCard({ variant, productId, onClick }: { variant: ProductVariant; productId: string; onClick: () => void }) {
+function VariantCard({ variant, onClick }: { variant: ProductVariant; onClick: () => void }) {
   const profit = variant.price - variant.cost;
   const margin = variant.cost > 0 ? ((profit / variant.cost) * 100).toFixed(0) : '—';
 
