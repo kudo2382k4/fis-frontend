@@ -249,7 +249,6 @@ export default function ProductDetailPage() {
           <Col xs={24} sm={12} md={8} lg={6} key={variant.id}>
             <VariantCard
               variant={variant}
-              productId={id!}
               onClick={() => navigate(`/products/${id}/variants/${variant.id}`)}
             />
           </Col>
